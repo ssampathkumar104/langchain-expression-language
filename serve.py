@@ -7,14 +7,16 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langserve import add_routes
 
-
+# Load Environment variables
 load_dotenv()
 
-
+# Reading Groq API key
 os.environ["GROQ_API_KEY"] = os.getenv("GROQ_API_KEY")
 
+# LLM with Groq 
 model = ChatGroq(model="llama-3.1-8b-instant", groq_api_key=os.getenv("GROQ_API_KEY"))
 
+# Create Chat template
 generic_prompt = "You are a helpful assistant that translates English to {language}."
 
 prompt = ChatPromptTemplate.from_messages([
@@ -22,14 +24,18 @@ prompt = ChatPromptTemplate.from_messages([
     ("user", "{input}")
 ])
 
+# String Output parser
 parser = StrOutputParser()
 
+# Chain using LCEL- Langchain Expression language
 chain = prompt | model | parser
 
+# App definition
 app = FastAPI(title="Simple LLM with LCEL and Groq API",
               version="0.1.0",
               description="An example FastAPI app using Langchain Execution Chains with Groq API.")
 
+# App, Chain and Routing
 add_routes(app, 
            chain, 
            path="/translate")
@@ -37,3 +43,4 @@ add_routes(app,
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="localhost", port=8000)
+
